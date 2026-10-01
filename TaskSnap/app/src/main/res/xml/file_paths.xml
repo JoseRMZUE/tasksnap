@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Rutas expuestas por FileProvider (autoridad ue.edu.co.tasksnap.fileprovider).
+  Solo se comparte files-dir (donde viven las evidencias privadas y el temporal
+  de cámara). NO se expone external storage ni caché: mínimo privilegio (RFN-09).
+  Hardening futuro: restringir a <files-path name="tmp" path="tmp_camara/"/>.
+-->
+<paths>
+    <files-path
+        name="tasksnap_files"
+        path="." />
+</paths>

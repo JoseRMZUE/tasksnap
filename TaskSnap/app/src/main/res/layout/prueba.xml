@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Pantalla principal de TaskSnap: formulario de órdenes de trabajo + listado.
+  Corresponde al diseño UI/UX del documento "Explicación del diseño de TaskSnap".
+
+  Estructura:
+    - Encabezado fijo (título y usuario en sesión).
+    - Mitad superior: ScrollView con formulario, zona de evidencia y botones CRUD.
+    - Mitad inferior: ListView con las órdenes activas (RF-05).
+
+  Convención de IDs (RFN-12): et=EditText, btn=Button, spn=Spinner,
+  lv=ListView, iv=ImageView, tv=TextView.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Encabezado: identidad de la app y sesión activa (RF-02) -->
+    <TextView
+        android:id="@+id/tvAppTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TaskSnap – Órdenes de trabajo"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvUsuarioSesion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sesión: (sin sesión)"
+        android:textSize="14sp" />
+
+    <!-- Bloque desplazable: formulario + evidencia + botones -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!--
+              Número de orden (RN-5 / RF-06 / decisión UD-01):
+              - En modo creación: su texto se IGNORA al guardar (Room autogenera).
+              - En modo edición: se muestra el número cargado y el campo se
+                deshabilita desde código (nadie cambia una PK).
+              - Para buscar: el técnico digita aquí y pulsa btnSearch (RF-06).
+            -->
+            <EditText
+                android:id="@+id/etOrderNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="N.º de orden (auto / buscar)"
+                android:inputType="number" />
+
+            <!-- Catálogo de tipos de servicio: se alimenta de la caché local (RF-19) -->
+            <Spinner
+                android:id="@+id/spnTipoServicio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!-- Catálogo de clientes: se alimenta de la caché local (RF-18, RN-9) -->
+            <Spinner
+                android:id="@+id/spnCliente"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!-- Descripción del trabajo: obligatoria (RF-04) -->
+            <EditText
+                android:id="@+id/etDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Descripción del trabajo"
+                android:inputType="textMultiLine"
+                android:minLines="3" />
+
+            <!-- Fecha del servicio en ISO 8601 (RN-8); TODO(Fase 2): DatePickerDialog -->
+            <EditText
+                android:id="@+id/etServiceDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Fecha servicio (yyyy-MM-dd)"
+                android:inputType="date" />
+
+            <!-- Estado: solo PENDIENTE / COMPLETADA (RN-1); opciones desde código -->
+            <Spinner
+                android:id="@+id/spnStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!-- Zona de evidencia fotográfica (RF-12): miniatura, captura y conteo -->
+            <ImageView
+                android:id="@+id/ivEvidence"
+                android:layout_width="match_parent"
+                android:layout_height="160dp"
+                android:layout_marginTop="8dp"
+                android:background="#EEEEEE"
+                android:contentDescription="Miniatura de la evidencia fotográfica"
+                android:scaleType="centerCrop" />
+
+            <Button
+                android:id="@+id/btnCamera"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Capturar evidencia" />
+
+            <TextView
+                android:id="@+id/tvEvidenceCount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Evidencias: 0" />
+
+            <!-- Fila 1 de botones: Create / Update / Delete del CRUD local -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSave"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Guardar" />
+
+                <Button
+                    android:id="@+id/btnEdit"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Editar" />
+
+                <Button
+                    android:id="@+id/btnDelete"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Eliminar" />
+            </LinearLayout>
+
+            <!-- Fila 2 de botones: Read (buscar/listar) y limpieza del formulario -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Buscar" />
+
+                <Button
+                    android:id="@+id/btnListing"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Listar" />
+
+                <Button
+                    android:id="@+id/btnClearFields"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Limpiar" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Listado de órdenes activas (RF-05); cada fila usa item_orden.xml -->
+    <ListView
+        android:id="@+id/lvList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+</LinearLayout>

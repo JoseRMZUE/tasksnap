@@ -1,0 +1,403 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "f915cef1f786e6d2a72b804a704a13b8",
+    "entities": [
+      {
+        "tableName": "tecnicos",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`tecnico_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nombre` TEXT NOT NULL, `usuario` TEXT NOT NULL, `password_hash` TEXT NOT NULL, `salt` TEXT NOT NULL, `activo` INTEGER NOT NULL DEFAULT 1)",
+        "fields": [
+          {
+            "fieldPath": "tecnicoId",
+            "columnName": "tecnico_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nombre",
+            "columnName": "nombre",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "usuario",
+            "columnName": "usuario",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "passwordHash",
+            "columnName": "password_hash",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "salt",
+            "columnName": "salt",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "activo",
+            "columnName": "activo",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "tecnico_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_tecnicos_usuario",
+            "unique": true,
+            "columnNames": [
+              "usuario"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_tecnicos_usuario` ON `${TABLE_NAME}` (`usuario`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "clientes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`cliente_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nombre` TEXT NOT NULL, `direccion` TEXT NOT NULL, `telefono` TEXT NOT NULL, `activo` INTEGER NOT NULL DEFAULT 1)",
+        "fields": [
+          {
+            "fieldPath": "clienteId",
+            "columnName": "cliente_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nombre",
+            "columnName": "nombre",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "direccion",
+            "columnName": "direccion",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "telefono",
+            "columnName": "telefono",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "activo",
+            "columnName": "activo",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "cliente_id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "servicios",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`servicio_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nombre` TEXT NOT NULL, `activo` INTEGER NOT NULL DEFAULT 1)",
+        "fields": [
+          {
+            "fieldPath": "servicioId",
+            "columnName": "servicio_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nombre",
+            "columnName": "nombre",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "activo",
+            "columnName": "activo",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "servicio_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_servicios_nombre",
+            "unique": true,
+            "columnNames": [
+              "nombre"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_servicios_nombre` ON `${TABLE_NAME}` (`nombre`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "ordenes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`num_orden` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tecnico_id` INTEGER NOT NULL, `servicio_id` INTEGER NOT NULL, `cliente_id` INTEGER NOT NULL, `descripcion` TEXT NOT NULL, `fecha_servicio` TEXT NOT NULL, `estado` TEXT NOT NULL DEFAULT 'PENDIENTE', `fecha_creacion` TEXT NOT NULL, `fecha_cierre` TEXT, `sincronizado` INTEGER NOT NULL DEFAULT 0, `activo` INTEGER NOT NULL DEFAULT 1, `num_orden_remoto` INTEGER, FOREIGN KEY(`tecnico_id`) REFERENCES `tecnicos`(`tecnico_id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`servicio_id`) REFERENCES `servicios`(`servicio_id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`cliente_id`) REFERENCES `clientes`(`cliente_id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "numOrden",
+            "columnName": "num_orden",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tecnicoId",
+            "columnName": "tecnico_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "servicioId",
+            "columnName": "servicio_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "clienteId",
+            "columnName": "cliente_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "descripcion",
+            "columnName": "descripcion",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fechaServicio",
+            "columnName": "fecha_servicio",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "estado",
+            "columnName": "estado",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'PENDIENTE'"
+          },
+          {
+            "fieldPath": "fechaCreacion",
+            "columnName": "fecha_creacion",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fechaCierre",
+            "columnName": "fecha_cierre",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sincronizado",
+            "columnName": "sincronizado",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "activo",
+            "columnName": "activo",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          },
+          {
+            "fieldPath": "numOrdenRemoto",
+            "columnName": "num_orden_remoto",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "num_orden"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_ordenes_tecnico_id",
+            "unique": false,
+            "columnNames": [
+              "tecnico_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ordenes_tecnico_id` ON `${TABLE_NAME}` (`tecnico_id`)"
+          },
+          {
+            "name": "index_ordenes_servicio_id",
+            "unique": false,
+            "columnNames": [
+              "servicio_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ordenes_servicio_id` ON `${TABLE_NAME}` (`servicio_id`)"
+          },
+          {
+            "name": "index_ordenes_cliente_id",
+            "unique": false,
+            "columnNames": [
+              "cliente_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ordenes_cliente_id` ON `${TABLE_NAME}` (`cliente_id`)"
+          },
+          {
+            "name": "index_ordenes_estado",
+            "unique": false,
+            "columnNames": [
+              "estado"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ordenes_estado` ON `${TABLE_NAME}` (`estado`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "tecnicos",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "tecnico_id"
+            ],
+            "referencedColumns": [
+              "tecnico_id"
+            ]
+          },
+          {
+            "table": "servicios",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "servicio_id"
+            ],
+            "referencedColumns": [
+              "servicio_id"
+            ]
+          },
+          {
+            "table": "clientes",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "cliente_id"
+            ],
+            "referencedColumns": [
+              "cliente_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "evidencias",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`evidencia_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `orden_id` INTEGER NOT NULL, `ruta_local` TEXT NOT NULL, `nombre_archivo` TEXT NOT NULL, `fecha_captura` TEXT NOT NULL, `sincronizado` INTEGER NOT NULL DEFAULT 0, `activo` INTEGER NOT NULL DEFAULT 1, FOREIGN KEY(`orden_id`) REFERENCES `ordenes`(`num_orden`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "evidenciaId",
+            "columnName": "evidencia_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ordenId",
+            "columnName": "orden_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rutaLocal",
+            "columnName": "ruta_local",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nombreArchivo",
+            "columnName": "nombre_archivo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fechaCaptura",
+            "columnName": "fecha_captura",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sincronizado",
+            "columnName": "sincronizado",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "activo",
+            "columnName": "activo",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "evidencia_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_evidencias_orden_id",
+            "unique": false,
+            "columnNames": [
+              "orden_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_evidencias_orden_id` ON `${TABLE_NAME}` (`orden_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "ordenes",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "orden_id"
+            ],
+            "referencedColumns": [
+              "num_orden"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f915cef1f786e6d2a72b804a704a13b8')"
+    ]
+  }
+}

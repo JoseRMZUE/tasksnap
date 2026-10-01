@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">TaskSnap</string>
+    <string name="tvTitle">Gestión de Órdenes de Trabajo - TaskSnap</string>
+    <string name="etOrderNumber">N° de orden: 2026001</string>
+    <string name="etOrderTitle">Título de la orden</string>
+    <string name="etDescription">Descripción del trabajo a realizar</string>
+    <string name="etDueDate">Fecha límite (dd/mm/aaaa)</string>
+    <string name="btnSave">Guardar</string>
+    <string name="btnListing">Listar</string>
+    <string name="btnClearFields">Limpiar</string>
+    <string name="btnSearch">Buscar</string>
+    <string name="btnEdit">Editar</string>
+    <string name="btnDelete">Eliminar</string>
+    <string name="lblOrdersSection">Órdenes registradas</string>
+    <string name="descIconAssignment">Icono de la aplicación</string>
+</resources>

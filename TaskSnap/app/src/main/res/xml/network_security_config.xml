@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Configuración de seguridad de red para DESARROLLO LOCAL (Fase 5).
+  Traza: Objetivo específico 3 (Acta v5) -> Integración app-API.
+
+  PROBLEMA: Android 9+ bloquea tráfico HTTP plano por defecto (solo permite HTTPS).
+  SOLUCIÓN: Permitir explícitamente cleartext traffic hacia nuestro servidor local
+            (10.0.2.2 para emulador, IPs privadas 192.168.x.x para celular físico).
+
+  SEGURIDAD: Esta configuración es SOLO para debug/local. En producción (Release),
+             se debe eliminar este archivo y usar HTTPS con certificado válido
+             emitido por Let's Encrypt o similar para cumplir RFN-05 (seguridad).
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- Excepción específica para desarrollo local -->
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- Emulador Android Studio -->
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <!-- Rango típico de redes locales Wi-Fi (ajusta según tu router) -->
+        <domain includeSubdomains="true">192.168.1.31</domain>
+        <domain includeSubdomains="true">192.168.1.32</domain>
+        <domain includeSubdomains="true">192.168.1.33</domain>
+        <!-- localhost por si pruebas en emulador con reenvío de puertos -->
+        <domain includeSubdomains="true">localhost</domain>
+    </domain-config>
+</network-security-config>
