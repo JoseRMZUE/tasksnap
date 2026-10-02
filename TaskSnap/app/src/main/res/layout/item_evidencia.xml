@@ -24,7 +24,7 @@
             android:layout_height="140dp"
             android:scaleType="centerCrop"
             android:background="@color/colorBackground"
-            android:contentDescription="Miniatura de evidencia" />
+            android:contentDescription="@string/descEvidenciaThumb" />
 
         <TextView
             android:id="@+id/tvEvidenciaFecha"
@@ -39,8 +39,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:minHeight="36dp"
-            android:text="Eliminar"
+            android:layout_marginHorizontal="2dp"
+            android:minHeight="48dp"
+            android:text="@string/btnDelete"
             android:textSize="12sp"
             android:backgroundTint="@color/btn_delete_tint"
             app:icon="@drawable/ic_delete"
