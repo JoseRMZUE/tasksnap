@@ -431,6 +431,7 @@ public class MainActivity extends AppCompatActivity {
                 new OrdenRepository.Callback<Integer>() {
                     @Override public void onExito(Integer filas) {
                         // Estado validado y aplicado; ahora los campos editables.
+                        ordenEnEdicion.setEstado(estadoNuevo);
                         ordenEnEdicion.setServicioId(idServicioSeleccionado());
                         ordenEnEdicion.setClienteId(idClienteSeleccionado());
                         ordenEnEdicion.setDescripcion(etDescription.getText().toString());
