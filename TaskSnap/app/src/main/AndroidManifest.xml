@@ -67,6 +67,11 @@
             android:screenOrientation="portrait" />
 
         <activity
+            android:name=".EvidenciaActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
             android:name=".ClientesActivity"
             android:exported="false"
             android:screenOrientation="portrait" />

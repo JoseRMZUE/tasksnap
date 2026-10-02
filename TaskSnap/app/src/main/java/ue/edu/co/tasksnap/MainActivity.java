@@ -44,9 +44,6 @@ import ue.edu.co.tasksnap.util.NotificacionUtil;
 import ue.edu.co.tasksnap.util.SesionLocal;
 
 import android.util.Log;
-import java.util.List;
-import ue.edu.co.tasksnap.data.local.entity.Servicio;
-import ue.edu.co.tasksnap.repository.ServicioRepository;
 
 // FASE 5 (RN-7): motor de sincronizacion remota
 import ue.edu.co.tasksnap.sync.SyncManager;
@@ -70,6 +67,11 @@ import ue.edu.co.tasksnap.sync.SyncManager;
  *
  * CAMBIO FASE 5 (RN-7, componente 4 del Acta v5): onResume dispara el
  * SyncManager para empujar la cola de ordenes pendientes al backend.
+ *
+ * CAMBIO (fix ciclo de vida): onSaveInstanceState + restauración en onCreate
+ * para que la orden en edición sobreviva si Android recrea esta Activity
+ * mientras la cámara del sistema está en primer plano (dispositivos reales
+ * con poca RAM pueden destruirla, a diferencia del emulador).
  *
  * Semántica de botones (contrato de IDs del Brief v1.1):
  *  - btnSave:  CREATE: crea una orden nueva desde el formulario (modo creación).
@@ -98,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView ivEvidence;
     private Button btnCamera;
     private TextView tvEvidenceCount;
+    private android.widget.Button btnVerEvidencias;
     private TextView tvUsuarioSesion;
     private ListView lvList;
 
@@ -177,6 +180,15 @@ public class MainActivity extends AppCompatActivity {
         tvUsuarioSesion.setText("Sesión: " + sesion.obtenerUsuario());
         cargarSpinners();
         refrescarLista();
+
+        // 5. Restaura la orden en edición si Android recreó esta Activity
+        //    (ej. al volver de la cámara y el sistema liberó memoria).
+        if (savedInstanceState != null) {
+            long numOrdenGuardado = savedInstanceState.getLong("numOrdenEnEdicion", -1L);
+            if (numOrdenGuardado > 0) {
+                cargarEnFormulario(numOrdenGuardado);
+            }
+        }
     }
 
 
@@ -208,6 +220,9 @@ public class MainActivity extends AppCompatActivity {
         // Por si se creó/editó un cliente o servicio en otra pantalla y
         // se volvió aquí, los spinners deben reflejar los datos más recientes.
         cargarSpinners();
+        if (ordenEnEdicion != null) {
+            actualizarConteoEvidencias(ordenEnEdicion.getNumOrden());
+        }
 
         new SyncManager(this).sincronizarOrdenesPendientes(new SyncManager.CallbackSync() {
             @Override
@@ -228,6 +243,19 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Fix de ciclo de vida: guarda qué orden estaba en edición antes de que
+     * Android pueda recrear esta Activity (ej. mientras la cámara del sistema
+     * está en primer plano). Se usa en onCreate para restaurarla.
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (ordenEnEdicion != null) {
+            outState.putLong("numOrdenEnEdicion", ordenEnEdicion.getNumOrden());
+        }
+    }
+
     /** Enlaza todas las vistas del layout por su ID del contrato. */
     private void enlazarVistas() {
         etOrderNumber = findViewById(R.id.etOrderNumber);
@@ -239,6 +267,7 @@ public class MainActivity extends AppCompatActivity {
         ivEvidence = findViewById(R.id.ivEvidence);
         btnCamera = findViewById(R.id.btnCamera);
         tvEvidenceCount = findViewById(R.id.tvEvidenceCount);
+        btnVerEvidencias = findViewById(R.id.btnVerEvidencias);
         tvUsuarioSesion = findViewById(R.id.tvUsuarioSesion);
         lvList = findViewById(R.id.lvList);
 
@@ -271,6 +300,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Fase 4 (RF-12): dispara la cámara del sistema sobre archivo temporal privado.
         btnCamera.setOnClickListener(v -> lanzarCamara());
+        btnVerEvidencias.setOnClickListener(v -> abrirGaleriaEvidencias());
+
     }
 
     /** Carga las cachés de servicios y clientes y alimenta los spinners. */
@@ -536,6 +567,16 @@ public class MainActivity extends AppCompatActivity {
         } else {
             permisoCamaraLauncher.launch(android.Manifest.permission.CAMERA);
         }
+    }
+    /** Abre la galería de evidencias de la orden cargada (ver/eliminar, RN-6). */
+    private void abrirGaleriaEvidencias() {
+        if (ordenEnEdicion == null) {
+            avisar("Selecciona una orden del listado primero");
+            return;
+        }
+        Intent intent = new Intent(this, EvidenciaActivity.class);
+        intent.putExtra(EvidenciaActivity.EXTRA_NUM_ORDEN, ordenEnEdicion.getNumOrden());
+        startActivity(intent);
     }
 
     /** Se ejecuta solo una vez el permiso de cámara ya está concedido. */
