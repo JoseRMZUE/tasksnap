@@ -3,6 +3,8 @@ package ue.edu.co.tasksnap;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.content.pm.PackageManager;
+import androidx.core.content.ContextCompat;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -108,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
     // --- Cámara (Fase 4, RF-12) ---
     private ActivityResultLauncher<Uri> camaraLauncher;
+    private ActivityResultLauncher<String> permisoCamaraLauncher;
     private File temporalCamara;
 
     /** Datos vivos del ListView (el adaptador los observa). */
@@ -133,6 +136,15 @@ public class MainActivity extends AppCompatActivity {
         camaraLauncher = registerForActivityResult(
                 new ActivityResultContracts.TakePicture(),
                 success -> onCamaraResultado(success));
+        permisoCamaraLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                concedido -> {
+                    if (concedido) {
+                        lanzarCamaraInterno();
+                    } else {
+                        avisar("Se necesita permiso de cámara para capturar evidencia.");
+                    }
+                });
 
         // 1. Inicializar sesión ANTES de inflar vistas para validar acceso.
         sesion = new SesionLocal(this);
@@ -166,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
         cargarSpinners();
         refrescarLista();
     }
+
 
     /**
      * FASE 5 (RN-7, componente 4 del Acta v5): disparador automatico del sync.
@@ -517,6 +530,16 @@ public class MainActivity extends AppCompatActivity {
             avisar("Guarda la orden primero para adjuntar evidencias");
             return;
         }
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+            lanzarCamaraInterno();
+        } else {
+            permisoCamaraLauncher.launch(android.Manifest.permission.CAMERA);
+        }
+    }
+
+    /** Se ejecuta solo una vez el permiso de cámara ya está concedido. */
+    private void lanzarCamaraInterno() {
         try {
             temporalCamara = CamaraHelper.crearArchivoTemporal(this);
             Uri uri = CamaraHelper.uriDeArchivo(this, temporalCamara);
