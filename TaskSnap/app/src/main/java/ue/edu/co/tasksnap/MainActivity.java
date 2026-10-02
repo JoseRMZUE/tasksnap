@@ -427,6 +427,8 @@ public class MainActivity extends AppCompatActivity {
         ordenRepo.obtenerPorId(numOrden, new OrdenRepository.Callback<Orden>() {
             @Override public void onExito(Orden orden) {
                 ordenEnEdicion = orden;
+                findViewById(R.id.btnEdit).setEnabled(true);
+                findViewById(R.id.btnDelete).setEnabled(true);
                 etOrderNumber.setText(String.valueOf(orden.getNumOrden()));
                 etOrderNumber.setEnabled(false);          // RN-5 / UD-01
                 etDescription.setText(orden.getDescripcion());
@@ -457,6 +459,8 @@ public class MainActivity extends AppCompatActivity {
     /** Sale del modo edición y deja el formulario listo para crear (UD-01). */
     private void limpiarFormulario() {
         ordenEnEdicion = null;
+        findViewById(R.id.btnEdit).setEnabled(false);
+        findViewById(R.id.btnDelete).setEnabled(false);
         etOrderNumber.setText("");
         etOrderNumber.setEnabled(true);
         etDescription.setText("");
