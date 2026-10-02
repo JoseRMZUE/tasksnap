@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -55,6 +56,7 @@ public final class RecordatorioScheduler {
             SimpleDateFormat formatoFecha = new SimpleDateFormat(FORMATO_FECHA, Locale.US);
             Date fecha = formatoFecha.parse(fechaServicio);
             if (fecha == null) {
+                Log.i("RECORDATORIO", "Fecha nula tras parsear: " + fechaServicio);
                 return;
             }
 
@@ -73,8 +75,15 @@ public final class RecordatorioScheduler {
             // Restar 1 hora para el recordatorio
             long tiempoRecordatorio = calendario.getTimeInMillis() - UN_HORA_MS;
 
+            Log.i("RECORDATORIO", "numOrden=" + numOrden
+                    + " horaServicio(ms)=" + calendario.getTimeInMillis()
+                    + " tiempoRecordatorio(ms)=" + tiempoRecordatorio
+                    + " ahora(ms)=" + System.currentTimeMillis()
+                    + " diferenciaMin=" + ((tiempoRecordatorio - System.currentTimeMillis()) / 60000));
+
             // Si el momento ya pasó, no programar nada
             if (tiempoRecordatorio < System.currentTimeMillis()) {
+                Log.i("RECORDATORIO", "DESCARTADA: el momento ya paso");
                 return;
             }
 
@@ -92,19 +101,22 @@ public final class RecordatorioScheduler {
             AlarmManager alarmManager =
                     (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             if (alarmManager == null) {
+                Log.i("RECORDATORIO", "AlarmManager es null");
                 return;
             }
 
             // Android 12+: sin permiso de alarmas exactas, caer a alarma inexacta
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
                     && !alarmManager.canScheduleExactAlarms()) {
+                Log.i("RECORDATORIO", "Programando INEXACTA (sin permiso de alarma exacta)");
                 alarmManager.set(AlarmManager.RTC_WAKEUP, tiempoRecordatorio, pendingIntent);
             } else {
+                Log.i("RECORDATORIO", "Programando EXACTA");
                 alarmManager.setExact(AlarmManager.RTC_WAKEUP, tiempoRecordatorio, pendingIntent);
             }
 
         } catch (ParseException e) {
-            // Fecha inválida: no programar (el repositorio ya validó el formato RN-8).
+            Log.i("RECORDATORIO", "ParseException: " + e.getMessage());
         }
     }
 

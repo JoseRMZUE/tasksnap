@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import android.os.Build;
 
 import ue.edu.co.tasksnap.data.local.entity.Cliente;
 import ue.edu.co.tasksnap.data.local.entity.Orden;
@@ -114,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
     // --- Cámara (Fase 4, RF-12) ---
     private ActivityResultLauncher<Uri> camaraLauncher;
     private ActivityResultLauncher<String> permisoCamaraLauncher;
+    private ActivityResultLauncher<String> permisoNotificacionesLauncher;
     private File temporalCamara;
 
     /** Datos vivos del ListView (el adaptador los observa). */
@@ -148,6 +150,9 @@ public class MainActivity extends AppCompatActivity {
                         avisar("Se necesita permiso de cámara para capturar evidencia.");
                     }
                 });
+        permisoNotificacionesLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                concedido -> { /* si lo niega, simplemente no vera recordatorios */ });
 
         // 1. Inicializar sesión ANTES de inflar vistas para validar acceso.
         sesion = new SesionLocal(this);
@@ -161,6 +166,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setContentView(R.layout.activity_main);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+            permisoNotificacionesLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS);
+        }
 
         // 3. Inicializar componentes normales.
         enlazarVistas();
