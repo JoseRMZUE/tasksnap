@@ -667,7 +667,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, 1, 0, "Clientes");
         menu.add(0, 2, 1, "Servicios");
-        menu.add(0, 3, 2, "Técnicos");
         menu.add(0, 4, 3, "Cerrar Sesión");
         return true;
     }
@@ -680,9 +679,6 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 2:
                 startActivity(new Intent(this, ServiciosActivity.class));
-                break;
-            case 3: // TODO(Fase 5): abrir gestión de técnicos (CRUD API).
-                avisar("Gestión de Técnicos (Fase 5)");
                 break;
             case 4: // RF-03: cerrar sesión real.
                 cerrarSesionYSalir();
@@ -700,7 +696,6 @@ public class MainActivity extends AppCompatActivity {
         PopupMenu popup = new PopupMenu(this, anchor);
         popup.getMenu().add(0, 1, 0, "Clientes");
         popup.getMenu().add(0, 2, 1, "Servicios");
-        popup.getMenu().add(0, 3, 2, "Técnicos");
         popup.getMenu().add(0, 4, 3, "Cerrar Sesión");
         popup.setOnMenuItemClickListener(this::onOptionsItemSelected);
         popup.show();
