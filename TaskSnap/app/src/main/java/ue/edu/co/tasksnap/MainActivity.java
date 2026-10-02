@@ -237,10 +237,14 @@ public class MainActivity extends AppCompatActivity {
         new SyncManager(this).sincronizarOrdenesPendientes(new SyncManager.CallbackSync() {
             @Override
             public void onExito(int exitosas, int fallidas, int totalEnServidor) {
-                Toast.makeText(MainActivity.this,
-                        "Sync: " + exitosas + " OK, " + fallidas + " fallida(s) · "
-                                + totalEnServidor + " en el servidor",
-                        Toast.LENGTH_LONG).show();
+                // UX: el Toast solo aparece si hubo trabajo real; entrar con
+                // cola vacía no genera ruido visual (ver javadoc de onResume).
+                if (exitosas + fallidas > 0) {
+                    Toast.makeText(MainActivity.this,
+                            "Sync: " + exitosas + " OK, " + fallidas + " fallida(s) · "
+                                    + totalEnServidor + " en el servidor",
+                            Toast.LENGTH_LONG).show();
+                }
                 // Tras un sync (incluso vacio), refrescar el listado por si
                 // vinieron ordenes del servidor en un pull futuro (v2).
                 refrescarLista();
