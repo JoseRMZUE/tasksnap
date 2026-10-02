@@ -31,7 +31,7 @@ android {
         // Para EMULADOR usa: "http://10.0.2.2:8080"
         // Para CELULAR FÍSICO usa: "http://<TU_IP_LOCAL>:8080"
         // Obtén tu IP con 'ipconfig' en CMD (Windows) buscando "IPv4 Address"
-        buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8080\"")
+        buildConfigField("String", "API_BASE_URL", "\"https://tasksnap-5kiu.onrender.com\"")
     }
 
     buildTypes {
