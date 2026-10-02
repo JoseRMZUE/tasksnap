@@ -23,9 +23,14 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import android.app.DatePickerDialog;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -73,6 +78,11 @@ import ue.edu.co.tasksnap.sync.SyncManager;
  * para que la orden en edición sobreviva si Android recrea esta Activity
  * mientras la cámara del sistema está en primer plano (dispositivos reales
  * con poca RAM pueden destruirla, a diferencia del emulador).
+ *
+ * CAMBIO (UX fecha): etServiceDate ya no se escribe a mano; abre un
+ * DatePickerDialog nativo y llena el campo en formato yyyy-MM-dd, el mismo
+ * que ya validan RecordatorioScheduler y el backend. Ningún otro archivo
+ * cambia: el contrato del campo de texto sigue siendo el mismo.
  *
  * Semántica de botones (contrato de IDs del Brief v1.1):
  *  - btnSave:  CREATE: crea una orden nueva desde el formulario (modo creación).
@@ -275,6 +285,7 @@ public class MainActivity extends AppCompatActivity {
         etOrderNumber = findViewById(R.id.etOrderNumber);
         etDescription = findViewById(R.id.etDescription);
         etServiceDate = findViewById(R.id.etServiceDate);
+        etServiceDate.setFocusable(false); // evita el teclado: solo se llena via calendario
         spnTipoServicio = findViewById(R.id.spnTipoServicio);
         spnCliente = findViewById(R.id.spnCliente);
         spnStatus = findViewById(R.id.spnStatus);
@@ -316,6 +327,8 @@ public class MainActivity extends AppCompatActivity {
         btnCamera.setOnClickListener(v -> lanzarCamara());
         btnVerEvidencias.setOnClickListener(v -> abrirGaleriaEvidencias());
 
+        // UX fecha: abre el calendario nativo en vez de dejar escribir a mano.
+        etServiceDate.setOnClickListener(v -> mostrarSelectorFecha());
     }
 
     /** Carga las cachés de servicios y clientes y alimenta los spinners. */
@@ -564,6 +577,39 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show();
     }
 
+    // --- FECHA DE SERVICIO (calendario nativo en vez de texto libre) ---
+
+    /** Abre el calendario nativo y llena etServiceDate en formato yyyy-MM-dd al elegir un día. */
+    private void mostrarSelectorFecha() {
+        Calendar calendario = Calendar.getInstance();
+
+        // Si ya hay una fecha escrita (modo edición), el calendario abre en ese día.
+        String fechaActual = etServiceDate.getText().toString();
+        if (!fechaActual.isEmpty()) {
+            try {
+                SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                Date fecha = formato.parse(fechaActual);
+                if (fecha != null) {
+                    calendario.setTime(fecha);
+                }
+            } catch (Exception e) {
+                // Si la fecha escrita no se puede leer, el calendario simplemente abre en hoy.
+            }
+        }
+
+        int anio = calendario.get(Calendar.YEAR);
+        int mes = calendario.get(Calendar.MONTH);
+        int dia = calendario.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog dialog = new DatePickerDialog(this,
+                (view, anioSel, mesSel, diaSel) -> {
+                    String fechaFormateada = String.format(Locale.US, "%04d-%02d-%02d",
+                            anioSel, mesSel + 1, diaSel);
+                    etServiceDate.setText(fechaFormateada);
+                }, anio, mes, dia);
+        dialog.show();
+    }
+
     // --- CÁMARA (Fase 4, RF-12) ---
 
     /**
@@ -583,6 +629,7 @@ public class MainActivity extends AppCompatActivity {
             permisoCamaraLauncher.launch(android.Manifest.permission.CAMERA);
         }
     }
+
     /** Abre la galería de evidencias de la orden cargada (ver/eliminar, RN-6). */
     private void abrirGaleriaEvidencias() {
         if (ordenEnEdicion == null) {
